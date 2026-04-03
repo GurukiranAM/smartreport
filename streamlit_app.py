@@ -71,7 +71,7 @@ Use formal academic tone and clear structure.
             data=final_report,
             file_name="SmartReport.txt"
         )
-            "📥 Download Report",
+        "📥 Download Report",
             final_report,
             file_name="SmartReport.txt")
       
