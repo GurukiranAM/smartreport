@@ -7,7 +7,7 @@ st.title("📄 SmartReport AI - Project Report Generator")
 
 # API setup
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-pro")
 
 # Sections
 sections = [
