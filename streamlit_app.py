@@ -65,11 +65,27 @@ Requirements:
 """
 
             try:
-                response = client.responses.create(
-                    model="gpt-4o-mini",
-                    input=prompt
-                )
-                content = response.output_text
+                responses = []
+
+for i in range(2):
+    response = client.responses.create(
+        model="gpt-4o-mini",
+        input=prompt
+    )
+    responses.append(response.output_text)
+
+# Show options
+st.subheader(f"📌 {section} - Choose Best Version")
+
+choice = st.radio(
+    f"Select version for {section}",
+    ["Option 1", "Option 2"],
+    key=section
+)
+
+content = responses[0] if choice == "Option 1" else responses[1]
+
+st.write(content)
 
             except Exception as e:
                 st.error(f"Error in {section}: {e}")
