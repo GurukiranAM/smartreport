@@ -1,18 +1,13 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
-# Page config
 st.set_page_config(page_title="SmartReport AI", layout="wide")
 
 st.title("📄 SmartReport AI - Project Report Generator")
 
-# ✅ API Key
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+# ✅ NEW SDK CLIENT
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-# ⚠️ Use stable model (important fix)
-model = genai.GenerativeModel("gemini-pro")
-
-# Sections
 sections = [
     "Abstract", "Introduction", "Literature Review",
     "Methodology", "Results", "Conclusion", "References"
@@ -31,20 +26,15 @@ ordered_sections = st.text_area(
 
 topic = st.text_input("Enter your project topic:")
 
-# Generate
 if st.button("🚀 Generate Report"):
 
     if not topic.strip():
-        st.warning("⚠️ Please enter a topic")
-
-    elif not ordered_sections.strip():
-        st.warning("⚠️ Please define sections")
+        st.warning("Enter topic")
 
     else:
         final_report = ""
 
-        # 🔥 Loading animation
-        with st.spinner("Generating AI-powered report... ⏳"):
+        with st.spinner("Generating report..."):
 
             for section in ordered_sections.split(","):
                 section = section.strip()
@@ -53,46 +43,31 @@ if st.button("🚀 Generate Report"):
                     continue
 
                 prompt = f"""
-You are an expert academic writer.
-
-Write a detailed {section} for a professional engineering project report.
+Write a detailed {section} for a project report.
 
 Topic: {topic}
 
-Instructions:
-- Minimum 300 words
-- Formal academic tone
-- Well-structured paragraphs
-- Include technical depth
-- Avoid unnecessary bullet points
+Use formal academic language and proper structure.
 """
 
                 try:
-                    response = model.generate_content(
-                        prompt,
-                        generation_config={
-                            "temperature": 0.7,
-                            "max_output_tokens": 800
-                        }
+                    response = client.models.generate_content(
+                        model="gemini-2.0-flash",   # 🔥 THIS IS THE FIX
+                        contents=prompt
                     )
 
-                    content = response.text if response.text else "No content generated."
+                    content = response.text
 
-                    # Display
-                    st.subheader(f"📌 {section}")
+                    st.subheader(section)
                     st.write(content)
 
                     final_report += f"\n\n{section}\n{content}"
 
                 except Exception as e:
-                    st.error(f"❌ Error in {section}: {e}")
+                    st.error(f"Error in {section}: {e}")
 
-        st.success("✅ Report Generated Successfully!")
-
-        # Download button
         st.download_button(
-            label="📥 Download Report",
-            data=final_report,
-            file_name="SmartReport.txt",
-            mime="text/plain"
+            "Download Report",
+            final_report,
+            "report.txt"
         )
