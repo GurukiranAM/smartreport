@@ -5,6 +5,9 @@ st.set_page_config(page_title="SmartReport AI", layout="wide")
 
 st.title("📄 SmartReport AI - Project Report Generator")
 
+# 🧪 DEBUG CHECK (VERY IMPORTANT)
+st.write("🔍 Key loaded:", "OPENAI_API_KEY" in st.secrets)
+
 # ✅ OpenAI Client
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
