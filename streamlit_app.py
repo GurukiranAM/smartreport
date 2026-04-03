@@ -42,8 +42,10 @@ if st.button("🚀 Generate Report"):
 
     if not topic:
         st.warning("Please enter a topic")
+
     elif not ordered_sections:
         st.warning("Please define sections")
+
     else:
         st.info("Generating report... please wait ⏳")
 
@@ -53,21 +55,20 @@ if st.button("🚀 Generate Report"):
             section = section.strip()
 
             prompt = f"""
-            Write a professional {section} for a project report on the topic:
-            {topic}.
+Write a professional {section} for a project report on the topic:
+{topic}.
 
-            Requirements:
-            - Formal academic language
-            - Clear structure
-            - Concise and meaningful content
-            """
+Requirements:
+- Formal academic language
+- Clear structure
+- Concise and meaningful content
+"""
 
             try:
                 response = client.responses.create(
                     model="gpt-4o-mini",
                     input=prompt
                 )
-
                 content = response.output_text
 
             except Exception as e:
@@ -81,6 +82,3 @@ if st.button("🚀 Generate Report"):
             final_report += f"\n\n{section}\n{content}"
 
         st.success("✅ Report Generated Successfully!")
-            final_report += f"\n\n{section}\n{content}"
-
-        st.success("Report Generated Successfully!")
