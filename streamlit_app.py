@@ -72,6 +72,6 @@ Use formal academic tone and clear structure.
             file_name="SmartReport.txt"
         )
         "📥 Download Report",
-            final_report,
-            file_name="SmartReport.txt")
+        final_report,
+        file_name="SmartReport.txt")
       
