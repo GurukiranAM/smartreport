@@ -6,7 +6,7 @@ st.set_page_config(page_title="SmartReport AI", layout="wide")
 st.title("📄 SmartReport AI - Project Report Generator")
 
 # ✅ API Client
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+client = genai.Client(api_key=st.secrets["OPENAI_API_KEY"])
 
 # Sections
 sections = [
