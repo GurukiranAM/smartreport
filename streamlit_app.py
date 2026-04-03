@@ -1,14 +1,18 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 
+# Page config
 st.set_page_config(page_title="SmartReport AI", layout="wide")
 
 st.title("📄 SmartReport AI - Project Report Generator")
 
-# ✅ API KEY (Streamlit secrets)
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+# ✅ API Key
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# 📌 Sections
+# ⚠️ Use stable model (important fix)
+model = genai.GenerativeModel("gemini-pro")
+
+# Sections
 sections = [
     "Abstract", "Introduction", "Literature Review",
     "Methodology", "Results", "Conclusion", "References"
@@ -27,56 +31,65 @@ ordered_sections = st.text_area(
 
 topic = st.text_input("Enter your project topic:")
 
-# 🚀 Generate Button
+# Generate
 if st.button("🚀 Generate Report"):
 
-    if not topic:
-        st.warning("Please enter a topic")
+    if not topic.strip():
+        st.warning("⚠️ Please enter a topic")
 
-    elif not ordered_sections:
-        st.warning("Please define sections")
+    elif not ordered_sections.strip():
+        st.warning("⚠️ Please define sections")
 
     else:
         final_report = ""
 
-        for section in ordered_sections.split(","):
-            section = section.strip()
+        # 🔥 Loading animation
+        with st.spinner("Generating AI-powered report... ⏳"):
 
-            if not section:
-                continue
+            for section in ordered_sections.split(","):
+                section = section.strip()
 
-            prompt = f"""
+                if not section:
+                    continue
+
+                prompt = f"""
 You are an expert academic writer.
 
-Write a detailed, professional {section} for a project report.
+Write a detailed {section} for a professional engineering project report.
 
 Topic: {topic}
 
-Rules:
-- Use formal academic tone
-- Be clear and structured
-- Avoid bullet points unless necessary
+Instructions:
+- Minimum 300 words
+- Formal academic tone
+- Well-structured paragraphs
+- Include technical depth
+- Avoid unnecessary bullet points
 """
 
-            try:
-                # ✅ Correct Gemini API call (NEW SDK)
-                response = client.models.generate_content(
-                    model="gemini-1.5-flash",
-                    contents=prompt
-                )
+                try:
+                    response = model.generate_content(
+                        prompt,
+                        generation_config={
+                            "temperature": 0.7,
+                            "max_output_tokens": 800
+                        }
+                    )
 
-                content = response.text
+                    content = response.text if response.text else "No content generated."
 
-                st.subheader(section)
-                st.write(content)
+                    # Display
+                    st.subheader(f"📌 {section}")
+                    st.write(content)
 
-                final_report += f"\n\n{section}\n{content}"
+                    final_report += f"\n\n{section}\n{content}"
 
-            except Exception as e:
-                st.error(f"Error in {section}: {e}")
+                except Exception as e:
+                    st.error(f"❌ Error in {section}: {e}")
 
         st.success("✅ Report Generated Successfully!")
 
+        # Download button
         st.download_button(
             label="📥 Download Report",
             data=final_report,
