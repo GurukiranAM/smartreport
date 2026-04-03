@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 29eb2dab6182fcde8009122d7c847e93e26e406f
 import streamlit as st
 import google.generativeai as genai
 
@@ -69,11 +65,8 @@ Use formal academic tone and clear structure.
 
         st.success("✅ Report Generated Successfully!")
 
-        # MUST be OUTSIDE loop (important fix)
         st.download_button(
             label="📥 Download Report",
             data=final_report,
             file_name="SmartReport.txt"
         )
-       
-      
