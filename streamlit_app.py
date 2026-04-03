@@ -1,5 +1,5 @@
 
-            final_report += f"\n\n{secimport streamlit as st
+import streamlit as st
 import google.generativeai as genai
 
 # ---------------------------
