@@ -1,9 +1,8 @@
 import streamlit as st
 from openai import OpenAI
-import os
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client using Streamlit secrets
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.set_page_config(page_title="SmartReport AI", layout="wide")
 
@@ -17,9 +16,13 @@ sections = [
     "Methodology", "Results", "Conclusion", "References"
 ]
 
-selected_sections = st.multiselect("Choose sections:", sections, default=sections)
+selected_sections = st.multiselect(
+    "Choose sections:",
+    sections,
+    default=sections
+)
 
-# Step 2: Order Sections
+# Step 2: Arrange Sections
 st.header("2. Arrange Sections")
 
 ordered_sections = st.text_area(
@@ -27,13 +30,23 @@ ordered_sections = st.text_area(
     ",".join(selected_sections)
 )
 
-# Step 3: Generate Content
-st.header("3. Generate Report")
+# Step 3: Topic Input
+st.header("3. Enter Topic")
 
 topic = st.text_input("Enter your project topic:")
 
-if st.button("Generate Report"):
-    if topic and ordered_sections:
+# Step 4: Generate Report
+st.header("4. Generate Report")
+
+if st.button("🚀 Generate Report"):
+
+    if not topic:
+        st.warning("Please enter a topic")
+    elif not ordered_sections:
+        st.warning("Please define sections")
+    else:
+        st.info("Generating report... please wait ⏳")
+
         final_report = ""
 
         for section in ordered_sections.split(","):
@@ -42,19 +55,32 @@ if st.button("Generate Report"):
             prompt = f"""
             Write a professional {section} for a project report on the topic:
             {topic}.
-            Keep it clear, formal, and structured.
+
+            Requirements:
+            - Formal academic language
+            - Clear structure
+            - Concise and meaningful content
             """
 
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}]
-            )
+            try:
+                response = client.responses.create(
+                    model="gpt-4o-mini",
+                    input=prompt
+                )
 
-            content = response.choices[0].message.content
+                content = response.output_text
 
-            st.subheader(section)
+            except Exception as e:
+                st.error(f"Error in {section}: {e}")
+                content = "Error generating content."
+
+            # Display section
+            st.subheader(f"📌 {section}")
             st.write(content)
 
+            final_report += f"\n\n{section}\n{content}"
+
+        st.success("✅ Report Generated Successfully!")
             final_report += f"\n\n{section}\n{content}"
 
         st.success("Report Generated Successfully!")
