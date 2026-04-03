@@ -1,15 +1,14 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
 st.set_page_config(page_title="SmartReport AI", layout="wide")
 
 st.title("📄 SmartReport AI - Project Report Generator")
 
-# API setup
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel("gemini-pro")
+# ✅ API KEY (Streamlit secrets)
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Sections
+# 📌 Sections
 sections = [
     "Abstract", "Introduction", "Literature Review",
     "Methodology", "Results", "Conclusion", "References"
@@ -28,7 +27,7 @@ ordered_sections = st.text_area(
 
 topic = st.text_input("Enter your project topic:")
 
-# Generate
+# 🚀 Generate Button
 if st.button("🚀 Generate Report"):
 
     if not topic:
@@ -43,16 +42,29 @@ if st.button("🚀 Generate Report"):
         for section in ordered_sections.split(","):
             section = section.strip()
 
+            if not section:
+                continue
+
             prompt = f"""
-Write a professional {section} for a project report.
+You are an expert academic writer.
+
+Write a detailed, professional {section} for a project report.
 
 Topic: {topic}
 
-Use formal academic tone and clear structure.
+Rules:
+- Use formal academic tone
+- Be clear and structured
+- Avoid bullet points unless necessary
 """
 
             try:
-                response = model.generate_content(prompt)
+                # ✅ Correct Gemini API call (NEW SDK)
+                response = client.models.generate_content(
+                    model="gemini-1.5-flash",
+                    contents=prompt
+                )
+
                 content = response.text
 
                 st.subheader(section)
@@ -68,5 +80,6 @@ Use formal academic tone and clear structure.
         st.download_button(
             label="📥 Download Report",
             data=final_report,
-            file_name="SmartReport.txt"
+            file_name="SmartReport.txt",
+            mime="text/plain"
         )
