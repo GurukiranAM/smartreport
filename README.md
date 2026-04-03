@@ -1,7 +1,10 @@
-# smartreportmaker AI system
-"Smart Project Report Maker" by Team "Hack jack" 
+# "Smart Project Report Maker AI"
+ By Team "Hack jack" 
+ 
 🚀 SmartReport AI
+
 Smart Project Report Maker by Team Hack Jack
+
 📌 Overview
 
 SmartReport AI is an intelligent project report generation system that uses AI to automatically create structured, professional reports from simple user inputs.
