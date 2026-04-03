@@ -1,14 +1,21 @@
-import streamlit as st
-from openai import OpenAI
 
-# Initialize OpenAI client using Streamlit secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            final_report += f"\n\n{secimport streamlit as st
+import google.generativeai as genai
 
+# ---------------------------
+# CONFIG
+# ---------------------------
 st.set_page_config(page_title="SmartReport AI", layout="wide")
+st.title("📄 SmartReport AI - Project Report Generator (Gemini)")
 
-st.title("📄 SmartReport AI - Project Report Generator")
+# Load API Key
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Step 1: Select Sections
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+# ---------------------------
+# STEP 1: SELECT SECTIONS
+# ---------------------------
 st.header("1. Select Report Sections")
 
 sections = [
@@ -22,7 +29,9 @@ selected_sections = st.multiselect(
     default=sections
 )
 
-# Step 2: Arrange Sections
+# ---------------------------
+# STEP 2: ORDER SECTIONS
+# ---------------------------
 st.header("2. Arrange Sections")
 
 ordered_sections = st.text_area(
@@ -30,12 +39,16 @@ ordered_sections = st.text_area(
     ",".join(selected_sections)
 )
 
-# Step 3: Topic Input
+# ---------------------------
+# STEP 3: TOPIC INPUT
+# ---------------------------
 st.header("3. Enter Topic")
 
 topic = st.text_input("Enter your project topic:")
 
-# Step 4: Generate Report
+# ---------------------------
+# STEP 4: GENERATE REPORT
+# ---------------------------
 st.header("4. Generate Report")
 
 if st.button("🚀 Generate Report"):
@@ -55,27 +68,26 @@ if st.button("🚀 Generate Report"):
             section = section.strip()
 
             prompt = f"""
-Write a professional {section} for a project report on the topic:
-{topic}.
+Write a professional {section} for a project report.
+
+Topic: {topic}
 
 Requirements:
-- Formal academic language
+- Formal academic tone
 - Clear structure
-- Concise and meaningful content
+- Human-like explanation
+- Do not use bullet points unless necessary
 """
 
             try:
-                # Generate 2 variations
+                # Generate 2 variations (better choice option)
                 responses = []
 
                 for i in range(2):
-                    response = client.responses.create(
-                        model="gpt-4o-mini",
-                        input=prompt
-                    )
-                    responses.append(response.output_text)
+                    response = model.generate_content(prompt)
+                    responses.append(response.text)
 
-                # Choose best version
+                # UI
                 st.subheader(f"📌 {section} - Choose Best Version")
 
                 choice = st.radio(
@@ -92,10 +104,19 @@ Requirements:
                 st.error(f"Error in {section}: {e}")
                 content = "Error generating content."
 
-            # Display final section always
-            st.subheader(f"📌 {section}")
+            # Final display
+            st.subheader(f"📌 Final: {section}")
             st.write(content)
 
             final_report += f"\n\n{section}\n{content}"
 
+        # ---------------------------
+        # DOWNLOAD OPTION
+        # ---------------------------
         st.success("✅ Report Generated Successfully!")
+
+        st.download_button(
+            "📥 Download Report",
+            final_report,
+            file_name="SmartReport.txt")
+      
