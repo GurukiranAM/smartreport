@@ -1,12 +1,12 @@
 import streamlit as st
-from google import genai
+from openai import OpenAI
 
 st.set_page_config(page_title="SmartReport AI", layout="wide")
 
 st.title("📄 SmartReport AI - Project Report Generator")
 
-# ✅ API Client
-client = genai.Client(api_key=st.secrets["OPENAI_API_KEY"])
+# ✅ OpenAI Client
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # Sections
 sections = [
@@ -39,7 +39,6 @@ if st.button("🚀 Generate Report"):
     else:
         with st.spinner("Generating full report... ⏳"):
 
-            # 🔥 SINGLE PROMPT (MAIN FIX)
             prompt = f"""
 You are an expert academic writer.
 
@@ -58,12 +57,12 @@ Rules:
 """
 
             try:
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt
+                response = client.responses.create(
+                    model="gpt-4o-mini",
+                    input=prompt
                 )
 
-                content = response.text
+                content = response.output_text
 
                 # Display full report
                 st.subheader("📄 Generated Report")
