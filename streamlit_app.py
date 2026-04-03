@@ -5,9 +5,11 @@ st.set_page_config(page_title="SmartReport AI", layout="wide")
 
 st.title("📄 SmartReport AI - Project Report Generator")
 
+# API setup
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-flash")
 
+# Sections
 sections = [
     "Abstract", "Introduction", "Literature Review",
     "Methodology", "Results", "Conclusion", "References"
@@ -26,6 +28,7 @@ ordered_sections = st.text_area(
 
 topic = st.text_input("Enter your project topic:")
 
+# Generate
 if st.button("🚀 Generate Report"):
 
     if not topic:
@@ -45,9 +48,7 @@ Write a professional {section} for a project report.
 
 Topic: {topic}
 
-Requirements:
-- Formal academic tone
-- Clear structure
+Use formal academic tone and clear structure.
 """
 
             try:
@@ -62,11 +63,12 @@ Requirements:
             except Exception as e:
                 st.error(f"Error in {section}: {e}")
 
-        st.success("Report Generated!")
+        st.success("✅ Report Generated Successfully!")
 
+        # MUST be OUTSIDE loop (important fix)
         st.download_button(
-            "Download Report",
-            final_report,
+            label="📥 Download Report",
+            data=final_report,
             file_name="SmartReport.txt"
         )
             "📥 Download Report",
